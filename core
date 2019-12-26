@@ -1,0 +1,50 @@
+(ns untitled.core
+  (:require [ring.adapter.jetty :as webserver]
+            [ring.middleware.reload :refer [wrap-reload]]
+            [compojure.core :refer [defroutes GET]]
+            [compojure.route :refer [not-found]]
+            [ring.handler.dump :refer [handle-dump]]
+            [untitled.rute :refer :all]
+            [clojure.java.jdbc :as jdbc]
+            )
+  )
+
+
+(defroutes app
+           (GET "/" [] welcome)
+           (GET "/zbogom" [] zbogom)
+           (GET "/about"   [] about)
+           (GET "/request-info" [] handle-dump)
+           (GET "/hello/:name" [] hello)
+           (GET "/insert" [] insert)
+           (GET "/getall" [] getall)
+           (GET "/brisi" [] brisi)
+           (not-found " <h1>greska</h1>")
+
+           )
+
+
+(defn -dev-main
+  "Jednostavna web aplikacija koristi Ring i Jetty, dodat je middleware wrap- -reload za automatsko prepoznavanje promena u kodu"
+  [port-number]
+  (webserver/run-jetty (wrap-reload #'app)
+                       {:port  (Integer. port-number)}))
+
+(defn main
+  "Ovde nema automatskog detektovanjaa promenee koda"
+  [port-number]
+  (webserver/run-jetty
+    app
+    {:port  (Integer. port-number)}))
+
+
+
+(defn test
+  [port-number]
+  (webserver/run-jetty (wrap-reload #'app)
+                       {:port  (Integer. port-number)})
+
+
+  )
+
+(test 8005)
